@@ -166,7 +166,7 @@ function compute() {
         } else {
           const sub = (pos === n - 1) ? 10 - d : 9 - d;
           r = sub * 2 + Math.floor(neighbor / 2) + (d % 2 === 1 ? 5 : 0) + carry;
-          explanation = `${d} → subtract ${(pos === n - 1) ? '10' : '9'} = ${sub}, then ${sub} × 2 + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' + 5' : ''} + carry ${carry}`;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, then ${sub} × 2 + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' + 5' : ''} + carry ${carry}`;
         }
         break;
 
@@ -177,7 +177,7 @@ function compute() {
         } else {
           const sub = (pos === n - 1) ? 10 - d : 9 - d;
           r = sub + Math.floor(neighbor / 2) + (d % 2 === 1 ? 5 : 0) + carry;
-          explanation = `${d} → subtract ${(pos === n - 1) ? '10' : '9'} = ${sub}, then + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' + 5' : ''} + carry ${carry}`;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, then + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' + 5' : ''} + carry ${carry}`;
         }
         break;
 
@@ -203,7 +203,7 @@ function compute() {
         } else {
           const sub = (pos === n - 1) ? 10 - d : 9 - d;
           r = sub * 2 + neighbor + carry;
-          explanation = `${d} → subtract ${(pos === n - 1) ? '10' : '9'} = ${sub}, then ${sub} × 2 + neighbor ${neighbor} + carry ${carry}`;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, then ${sub} × 2 + neighbor ${neighbor} + carry ${carry}`;
         }
         break;
 
@@ -214,7 +214,7 @@ function compute() {
         } else {
           const sub = (pos === n - 1) ? 10 - d : 9 - d;
           r = sub + neighbor + carry;
-          explanation = `${d} → subtract ${(pos === n - 1) ? '10' : '9'} = ${sub}, + neighbor ${neighbor} + carry ${carry}`;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, + neighbor ${neighbor} + carry ${carry}`;
         }
         break;
 
