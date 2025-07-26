@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Day of Week Calculator - Odd + 11 Rule</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 20px;
+    }
+    .branch {
+      margin-left: 20px;
+      border-left: 2px dashed #ccc;
+      padding-left: 10px;
+    }
+    .step {
+      padding: 10px 15px;
+      margin: 5px 0;
+      border-left: 5px solid #999;
+      background: #fff;
+      transition: background 0.4s, border-color 0.4s;
+    }
+    .active {
+      background: #d1e7dd;
+      border-color: #28a745;
+    }
+    .value {
+      font-weight: bold;
+      color: #333;
+      margin-left: 10px;
+    }
+    #result {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      font-size: 16px;
+      padding: 5px;
+      width: 200px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 6px 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Day of the Week Calculator</h1>
+  <p>Using the Odd + 11 Rule for year code calculation (with flowchart branching)</p>
+
+  <label>Date (YYYY-MM-DD): <input type="text" id="dateInput" placeholder="e.g. 2025-04-14"></label>
+  <button onclick="startCalculation()">Calculate</button>
+
+  <div class="flowchart">
+    <div class="step" id="step1">Extract last two digits of the year <span class="value" id="val1"></span></div>
+    <div class="step" id="step2">Is it odd? <span class="value" id="val2"></span></div>
+    <div class="branch">
+      <div class="step" id="step2a">Yes → Add 11 <span class="value" id="val2a"></span></div>
+      <div class="step" id="step2b">No → Do nothing <span class="value" id="val2b"></span></div>
+    </div>
+    <div class="step" id="step3">Divide result by 2 <span class="value" id="val3"></span></div>
+    <div class="step" id="step4">Is it odd? <span class="value" id="val4"></span></div>
+    <div class="branch">
+      <div class="step" id="step4a">Yes → Add 11 <span class="value" id="val4a"></span></div>
+      <div class="step" id="step4b">No → Do nothing <span class="value" id="val4b"></span></div>
+    </div>
+    <div class="step" id="step5">Subtract result from multiple of 7 <span class="value" id="val5"></span></div>
+    <div class="step" id="step6">Modulo 7 to get year code <span class="value" id="val6"></span></div>
+    <div class="step" id="step7">Use century anchor + year code to get doomsday <span class="value" id="val7"></span></div>
+    <div class="step" id="step8">Use month's doomsday to compute weekday <span class="value" id="val8"></span></div>
+    <div class="step" id="step9">Account for leap year if necessary <span class="value" id="val9"></span></div>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const allSteps = ['step1','step2','step2a','step2b','step3','step4','step4a','step4b','step5','step6','step7','step8','step9'];
+
+    async function startCalculation() {
+      allSteps.forEach(id => document.getElementById(id).classList.remove('active'));
+      [1,2,"2a","2b",3,4,"4a","4b",5,6,7,8,9].forEach(n => {
+        const el = document.getElementById(`val${n}`);
+        if (el) el.textContent = '';
+      });
+
+      const input = document.getElementById('dateInput').value.trim();
+      const parts = input.split("-");
+      if (parts.length !== 3) return alert("Please enter the date in YYYY-MM-DD format");
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]);
+      const day = parseInt(parts[2]);
+      if (isNaN(year) || isNaN(month) || isNaN(day)) return alert("Invalid date components");
+
+      await highlight('step1');
+      let yy = year % 100;
+      document.getElementById('val1').textContent = yy;
+
+      await highlight('step2');
+      document.getElementById('val2').textContent = yy % 2 === 1 ? "Yes" : "No";
+      if (yy % 2 === 1) {
+        await highlight('step2a');
+        yy += 11;
+        document.getElementById('val2a').textContent = yy;
+      } else {
+        await highlight('step2b');
+        document.getElementById('val2b').textContent = yy;
+      }
+
+      await highlight('step3');
+      yy = Math.floor(yy / 2);
+      document.getElementById('val3').textContent = yy;
+
+      await highlight('step4');
+      document.getElementById('val4').textContent = yy % 2 === 1 ? "Yes" : "No";
+      if (yy % 2 === 1) {
+        await highlight('step4a');
+        yy += 11;
+        document.getElementById('val4a').textContent = yy;
+      } else {
+        await highlight('step4b');
+        document.getElementById('val4b').textContent = yy;
+      }
+
+      await highlight('step5');
+      yy = 7 - (yy % 7);
+      document.getElementById('val5').textContent = yy;
+
+      await highlight('step6');
+      const yearCode = yy % 7;
+      document.getElementById('val6').textContent = yearCode;
+
+      await highlight('step7');
+      const centuryAnchor = [2, 0, 5, 3];
+      const anchorCode = centuryAnchor[Math.floor(year / 100) % 4];
+      const doomsday = (yearCode + anchorCode) % 7;
+      document.getElementById('val7').textContent = `${anchorCode} + ${yearCode} = ${doomsday}`;
+
+      await highlight('step8');
+      const isLeap = (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
+      const doomsdays = isLeap ? [4, 29, 14, 4, 9, 6, 11, 8, 5, 10, 7, 12] : [3, 28, 14, 4, 9, 6, 11, 8, 5, 10, 7, 12];
+      const doomsdayDate = doomsdays[month - 1];
+      const delta = (day - doomsdayDate + 35) % 7;
+      document.getElementById('val8').textContent = `(${day} - ${doomsdayDate} + ${doomsday}) mod 7`;
+
+      await highlight('step9');
+      const finalDay = (doomsday + delta) % 7;
+      const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      document.getElementById('val9').textContent = `Leap Year: ${isLeap}`;
+
+      document.getElementById('result').innerText = `Day of the week: ${weekday[finalDay]}`;
+    }
+
+    async function highlight(stepId) {
+      document.getElementById(stepId).classList.add('active');
+      await new Promise(resolve => setTimeout(resolve, 600));
+    }
+  </script>
+</body>
+</html>
