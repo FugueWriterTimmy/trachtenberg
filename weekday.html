@@ -1,64 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Day of Week Calculator - Odd + 11 Rule</title>
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 30px;
+      background: linear-gradient(to right, #f0f0f0, #e9f4ff);
+      color: #333;
     }
+
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      color: #0c4f7d;
+      margin-bottom: 10px;
+    }
+
+    p {
+      text-align: center;
+      font-style: italic;
+      margin-bottom: 30px;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      font-size: 1em;
+      padding: 8px 10px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 1em;
+      background-color: #0c4f7d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #18679d;
+    }
+
     .flowchart {
+      margin: auto;
+      max-width: 600px;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      margin-top: 20px;
+      gap: 10px;
     }
+
     .branch {
       margin-left: 20px;
-      border-left: 2px dashed #ccc;
-      padding-left: 10px;
+      border-left: 2px dashed #aaa;
+      padding-left: 15px;
     }
+
     .step {
-      padding: 10px 15px;
-      margin: 5px 0;
-      border-left: 5px solid #999;
-      background: #fff;
+      background: #ffffff;
+      border-left: 6px solid #888;
+      padding: 12px 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       transition: background 0.4s, border-color 0.4s;
     }
+
     .active {
-      background: #d1e7dd;
+      background: #e6f9ec;
       border-color: #28a745;
     }
+
     .value {
       font-weight: bold;
-      color: #333;
-      margin-left: 10px;
+      color: #004085;
+      float: right;
     }
+
     #result {
+      margin-top: 30px;
+      font-size: 1.2em;
       font-weight: bold;
-      margin-top: 20px;
-    }
-    input[type="text"] {
-      font-size: 16px;
-      padding: 5px;
-      width: 200px;
-      margin-right: 10px;
-    }
-    button {
-      padding: 6px 12px;
-      font-size: 16px;
-      cursor: pointer;
+      text-align: center;
+      color: #1d3557;
     }
   </style>
 </head>
 <body>
   <h1>Day of the Week Calculator</h1>
-  <p>Using the Odd + 11 Rule for year code calculation (with flowchart branching)</p>
+  <p>Using the Odd + 11 Rule to calculate the year code</p>
 
-  <label>Date (YYYY-MM-DD): <input type="text" id="dateInput" placeholder="e.g. 2025-04-14"></label>
-  <button onclick="startCalculation()">Calculate</button>
+  <div class="input-container">
+    <label for="dateInput">Date (YYYY-MM-DD):</label>
+    <input type="text" id="dateInput" placeholder="e.g. 2025-04-14">
+    <button onclick="startCalculation()">Calculate</button>
+  </div>
 
   <div class="flowchart">
     <div class="step" id="step1">Extract last two digits of the year <span class="value" id="val1"></span></div>
