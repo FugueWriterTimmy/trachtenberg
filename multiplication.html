@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trachtenberg Method Multiplication Calculator (2-11)</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 650px;
+    margin: 2em auto;
+    padding: 1em 2em;
+    background: #fafafa;
+    color: #222;
+  }
+  h1 {
+    text-align: center;
+    color: #1a73e8;
+    margin-bottom: 1em;
+    font-weight: 700;
+    font-size: 2.2em;
+    letter-spacing: 0.05em;
+  }
+  label {
+    display: block;
+    margin-top: 1em;
+    font-weight: 600;
+    font-size: 1.1em;
+    color: #333;
+  }
+  input[type="text"], select {
+    font-size: 1em;
+    padding: 0.3em 0.5em;
+    margin-top: 0.3em;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 150px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus, select:focus {
+    border-color: #1a73e8;
+    outline: none;
+  }
+  button {
+    font-size: 1em;
+    margin: 1.5em 0.7em 0 0;
+    padding: 0.5em 1.3em;
+    background-color: #1a73e8;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgb(26 115 232 / 0.4);
+    transition: background-color 0.25s ease;
+  }
+  button:hover {
+    background-color: #155ab6;
+  }
+  #result {
+    margin-top: 2em;
+    padding: 1em;
+    background-color: #e8f0fe;
+    border-left: 6px solid #1a73e8;
+    border-radius: 5px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1em;
+    line-height: 1.4em;
+  }
+  .steps {
+    background: #f0f4ff;
+    border-left: 4px solid #4caf50;
+    padding: 0.5em 1em;
+    margin: 1em 0;
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95em;
+    color: #2b2b2b;
+    border-radius: 4px;
+  }
+  h3 {
+    margin-top: 1em;
+    color: #1a3e72;
+    font-weight: 700;
+  }
+  #history {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  #history li {
+    margin-bottom: 0.5em;
+    font-weight: 600;
+  }
+  #history button {
+    margin-left: 0.7em;
+    padding: 0.3em 0.7em;
+    font-size: 0.85em;
+    background-color: #34a853;
+    box-shadow: none;
+  }
+  #history button:hover {
+    background-color: #2a844c;
+  }
+</style>
+</head>
+<body>
+  <h1>Trachtenberg Method Multiplication Calculator</h1>
+  <h4>Check <a href="https://fuguewritertimmy.github.io/trachtenberg/addition.html">this</a> out for an addition calculator!</h4>
+  <label>Multiplicand:
+    <input type="text" id="a" autocomplete="off" />
+  </label>
+  <label>Multiplier:
+    <select id="b" aria-label="Multiplier selection">
+      <option>2</option><option>3</option><option>4</option>
+      <option>5</option><option>6</option><option>7</option>
+      <option>8</option><option>9</option><option>10</option>
+      <option>11</option>
+    </select>
+  </label>
+  <button onclick="compute()">Compute</button>
+  <button onclick="clearHistory()">Clear History</button>
+
+  <div id="result" role="region" aria-live="polite"></div>
+
+  <h2>History</h2>
+  <ul id="history" aria-label="Calculation history"></ul>
+
+<script>
+const history = [];
+
+function compute() {
+  const a = document.getElementById('a').value.trim();
+  const b = parseInt(document.getElementById('b').value);
+
+  if (!/^\d+$/.test(a)) {
+    alert('Please enter a valid non-negative integer multiplicand.');
+    return;
+  }
+
+  const digs = a.split('').map(d => parseInt(d));
+  digs.unshift(0); // Trachtenberg leading zero
+
+  const n = digs.length;
+  let carry = 0;
+  let resultDigits = [];
+  const steps = [];
+
+  for (let pos = n - 1; pos >= 0; pos--) {
+    const d = digs[pos];
+    const neighbor = pos < n - 1 ? digs[pos + 1] : 0;
+    const isLeadingZero = (pos === 0);
+    let r = 0;
+    let explanation = '';
+
+    switch (b) {
+      case 2:
+        r = d * 2 + carry;
+        explanation = `${d} × 2 + carry ${carry}`;
+        break;
+
+      case 3:
+        if (isLeadingZero) {
+          r = Math.floor(neighbor / 2) - 2 + carry;
+          explanation = `Leading zero: half neighbor ${Math.floor(neighbor / 2)} - 2 + carry ${carry}`;
+        } else {
+          const sub = (pos === n - 1) ? 10 - d : 9 - d;
+          r = sub * 2 + Math.floor(neighbor / 2) + (d % 2 === 1 ? 5 : 0) + carry;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, then ${sub} × 2 + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' + 5' : ''} + carry ${carry}`;
+        }
+        break;
+
+      case 4:
+        if (isLeadingZero) {
+          r = Math.floor(neighbor / 2) - 1 + carry;
+          explanation = `Leading zero: half neighbor ${Math.floor(neighbor / 2)} - 1 + carry ${carry}`;
+        } else {
+          const sub = (pos === n - 1) ? 10 - d : 9 - d;
+          r = sub + Math.floor(neighbor / 2) + (d % 2 === 1 ? 5 : 0) + carry;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, then + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' + 5' : ''} + carry ${carry}`;
+        }
+        break;
+
+      case 5:
+        r = Math.floor(neighbor / 2) + (d % 2 === 1 ? 5 : 0) + carry;
+        explanation = `Half neighbor ${neighbor} is ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ', +5' : ''} + carry ${carry}`;
+        break;
+
+      case 6:
+        r = d + Math.floor(neighbor / 2) + (d % 2 === 1 ? 5 : 0) + carry;
+        explanation = `${d} + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' +5' : ''} + carry ${carry}`;
+        break;
+
+      case 7:
+        r = 2 * d + Math.floor(neighbor / 2) + (d % 2 === 1 ? 5 : 0) + carry;
+        explanation = `${d} × 2 + half neighbor ${Math.floor(neighbor / 2)}${d % 2 === 1 ? ' +5' : ''} + carry ${carry}`;
+        break;
+
+      case 8:
+        if (isLeadingZero) {
+          r = neighbor - 2 + carry;
+          explanation = `Leading zero: neighbor ${neighbor} - 2 + carry ${carry}`;
+        } else {
+          const sub = (pos === n - 1) ? 10 - d : 9 - d;
+          r = sub * 2 + neighbor + carry;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, then ${sub} × 2 + neighbor ${neighbor} + carry ${carry}`;
+        }
+        break;
+
+      case 9:
+        if (isLeadingZero) {
+          r = neighbor - 1 + carry;
+          explanation = `Leading zero: neighbor ${neighbor} - 1 + carry ${carry}`;
+        } else {
+          const sub = (pos === n - 1) ? 10 - d : 9 - d;
+          r = sub + neighbor + carry;
+          explanation = `${d} → subtract from ${(pos === n - 1) ? '10' : '9'} = ${sub}, + neighbor ${neighbor} + carry ${carry}`;
+        }
+        break;
+
+      case 10:
+        r = d * 10 + carry;
+        explanation = `${d} × 10 + carry ${carry}`;
+        break;
+
+      case 11:
+        r = d + neighbor + carry;
+        explanation = `${d} + neighbor ${neighbor} + carry ${carry}`;
+        break;
+
+      default:
+        r = d * b + carry;
+        explanation = `${d} × ${b} + carry ${carry} (fallback)`;
+    }
+
+    let digit = r % 10;
+    carry = Math.floor(r / 10);
+    if (digit < 0) {
+      digit += 10;
+      carry -= 1;
+    }
+
+    resultDigits.unshift(digit);
+    steps.push(`${explanation} → write ${digit}, carry = ${carry}`);
+  }
+
+  while (resultDigits.length > 1 && resultDigits[0] === 0) resultDigits.shift();
+  if (carry > 0) resultDigits.unshift(carry);
+
+  const answer = resultDigits.join('');
+  history.push({ a, b, answer, steps });
+  show({ a, b, answer, steps });
+}
+
+function show(record) {
+  const rdiv = document.getElementById('result');
+  rdiv.innerHTML =
+    `<h3>${record.a} × ${record.b} = ${record.answer}</h3>` +
+    record.steps.map(s => `<div class="steps">${s}</div>`).join('');
+  const li = document.createElement('li');
+  const btn = document.createElement('button');
+  btn.textContent = `Review ${record.a}×${record.b}`;
+  btn.onclick = () => show(record);
+  li.textContent = `${record.a}×${record.b} = ${record.answer} `;
+  li.appendChild(btn);
+  document.getElementById('history').appendChild(li);
+}
+
+function clearHistory() {
+  history.length = 0;
+  document.getElementById('history').innerHTML = '';
+  document.getElementById('result').innerHTML = '';
+}
+</script>
+</body>
+</html>
