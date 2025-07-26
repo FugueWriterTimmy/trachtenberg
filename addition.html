@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trachtenberg Addition</title>
+  <style>
+    body {
+      background: #f8f9fa;
+      font-family: 'Fira Code', monospace;
+      padding: 30px;
+      color: #212529;
+    }
+    h2 {
+      color: #343a40;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      font-size: 16px;
+      padding: 10px;
+      border: 2px solid #ced4da;
+      border-radius: 8px;
+      background: #ffffff;
+      resize: vertical;
+    }
+    button {
+      margin-top: 10px;
+      width: 100%;
+      background-color: #495057;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #343a40;
+    }
+    pre {
+      background: #e9ecef;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-top: 20px;
+      overflow-x: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h2>Trachtenberg Addition Calculator</h2>
+  <textarea id="input" rows="10" placeholder="Enter rows of digits..."></textarea>
+  <button onclick="computeLAddition()">Compute</button>
+  <pre id="output"></pre>
+
+  <script>
+    function computeLAddition() {
+      const raw = document.getElementById("input").value.trim().split("\n").map(r => r.trim());
+      if (raw.length === 0 || raw[0] === "") {
+        document.getElementById("output").textContent = "Please enter at least one line of digits.";
+        return;
+      }
+
+      const maxLen = Math.max(...raw.map(r => r.length));
+      const cols = maxLen + 1;
+      const rows = raw.map(r => r.padStart(maxLen, '0').split('').map(d => parseInt(d)));
+
+      const tickedRows = [];
+      const sumCols = Array(cols).fill(0);
+      const tickCols = Array(cols).fill(0);
+
+      for (let r = 0; r < rows.length; r++) {
+        rows[r].unshift(0);
+        tickedRows[r] = Array(cols).fill("");
+      }
+
+      for (let c = 0; c < cols; c++) {
+        let sum = 0, ticks = 0;
+        for (let r = 0; r < rows.length; r++) {
+          sum += rows[r][c];
+          if (sum > 11) {
+            sum -= 11;
+            ticks++;
+            tickedRows[r][c] = "'";
+          }
+        }
+        sumCols[c] = sum;
+        tickCols[c] = ticks;
+      }
+
+      const final = Array(cols).fill(0);
+      let carry = 0;
+      for (let c = cols - 1; c >= 0; c--) {
+        let prevTicks = (c < cols - 1) ? tickCols[c + 1] : 0;
+        let total = sumCols[c] + tickCols[c] + prevTicks + carry;
+        final[c] = total % 10;
+        carry = Math.floor(total / 10);
+      }
+
+      let output = "";
+
+      for (let r = 0; r < rows.length; r++) {
+        output += "  " + rows[r].map((d, i) => ("" + d + tickedRows[r][i]).padStart(2)).join(" ") + "\n";
+      }
+
+      output += "  " + "- ".repeat(cols) + "\n";
+      output += "  " + sumCols.map(n => String(n).padStart(2)).join(" ") + "   running totals\n";
+      output += "  " + tickCols.map(n => String(n).padStart(2)).join(" ") + "   tick marks\n";
+      output += "  " + "- ".repeat(cols) + "\n";
+
+      const finalStr = carry > 0 ? String(carry).padStart(2) + " " : "   ";
+      output += finalStr + final.map(n => String(n).padStart(2)).join(" ") + "   total";
+
+      document.getElementById("output").textContent = output;
+    }
+  </script>
+</body>
+</html>
