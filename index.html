@@ -2,46 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trachtenberg System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trachtenberg Speed Math</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f8;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #fce4ec);
       color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       text-align: center;
-      padding: 40px;
     }
+
     h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
+      font-size: 3em;
+      margin-bottom: 0.3em;
+      z-index: 1;
     }
+
     p {
       font-size: 1.2em;
-      max-width: 600px;
-      margin: 0 auto 30px auto;
+      max-width: 700px;
+      padding: 0 20px;
+      z-index: 1;
     }
-    .button {
-      display: inline-block;
-      padding: 12px 24px;
-      margin: 10px;
-      background-color: #4a90e2;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .btn {
+      padding: 15px 30px;
       font-size: 1em;
-      transition: background-color 0.3s;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
     }
-    .button:hover {
-      background-color: #357ac9;
+
+    .btn:hover {
+      background-color: #0d47a1;
+    }
+
+    footer {
+      margin-top: 60px;
+      font-size: 0.9em;
+      color: #555;
+      z-index: 1;
+    }
+
+    /* Falling number styles */
+    .number {
+      position: absolute;
+      font-size: 1.2em;
+      color: rgba(0, 0, 0, 0.2);
+      user-select: none;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-5%);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(105vh);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to the Trachtenberg System</h1>
-  <p>This is a digital implementation of the Trachtenberg Speed System of Basic Mathematics. Explore intuitive techniques for lightning-fast calculations, including addition, multiplication, and (later) beyond! Info is taken from <a href="https://en.wikipedia.org/wiki/Trachtenberg_system">Wikipedia</a> and <a href="https://www.wikihow.com/Trachtenberg-Method">Wikihow</a> (take that, schools!).</p>
-  
-  <a class="button" href="addition.html">Addition</a>
-  <a class="button" href="multiplication.html">Multiplication</a>
+  <h1>⚡ Trachtenberg Speed Math</h1>
+  <p>
+    Welcome to a digital implementation of the legendary Trachtenberg Speed System of Basic Mathematics!<br/>
+    Discover clever mental math shortcuts for ultra-fast calculations — addition, multiplication, and beyond.<br/>
+    Adapted from Wikipedia and WikiHow. Take that, schools!
+  </p>
+
+  <div class="buttons">
+    <a href="addition.html" class="btn">➕ Try Addition</a>
+    <a href="multiplication.html" class="btn">✖️ Try Multiplication</a>
+  </div>
+
+  <footer>
+    Made by a real human calculator. Version 1.0
+  </footer>
+
+  <!-- Number Rain Script -->
+  <script>
+    function createFallingNumber() {
+      const number = document.createElement("div");
+      number.classList.add("number");
+      number.style.left = Math.random() * 100 + "vw";
+      number.style.animationDuration = (Math.random() * 2 + 3) + "s";
+      number.textContent = Math.floor(Math.random() * 1000);
+      document.body.appendChild(number);
+      setTimeout(() => number.remove(), 5000);
+    }
+
+    setInterval(createFallingNumber, 150);
+  </script>
 </body>
 </html>
