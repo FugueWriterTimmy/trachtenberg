@@ -92,7 +92,7 @@
   <p>
     Welcome to a digital implementation of the legendary Trachtenberg Speed System of Basic Mathematics!<br/>
     Discover clever mental math shortcuts for ultra-fast calculations — addition, multiplication, and beyond.<br/>
-    Adapted from Wikipedia and WikiHow. Take that, schools!
+    Adapted from Wikipedia and WikiHow. School was obviously wrong.
   </p>
 
   <div class="buttons">
@@ -102,7 +102,7 @@
   </div>
 
   <footer>
-    Made by a real human calculator. Version 1.0
+    Made by a real human calculator
   </footer>
 
   <!-- Number Rain Script -->
@@ -112,7 +112,7 @@
       number.classList.add("number");
       number.style.left = Math.random() * 100 + "vw";
       number.style.animationDuration = (Math.random() * 2 + 3) + "s";
-      number.textContent = Math.floor(Math.random() * 1000000000);
+      number.textContent = Math.floor(Math.random() * 1000);
       document.body.appendChild(number);
       setTimeout(() => number.remove(), 5000);
     }
