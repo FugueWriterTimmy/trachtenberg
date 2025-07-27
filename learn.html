@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TrachtenBattle: Wizard of Numbers</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f0ff;
+      color: #2e2e2e;
+      text-align: center;
+      padding: 30px;
+    }
+    #game {
+      max-width: 700px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    }
+    #dialogue, #story {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #e6e0ff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: inset 0 0 8px rgba(100, 100, 255, 0.2);
+    }
+    #question {
+      font-size: 1.4em;
+      margin: 20px 0;
+      font-weight: bold;
+      text-align: center;
+    }
+    input[type="number"] {
+      font-size: 1.5em;
+      width: 150px;
+      text-align: center;
+    }
+    button {
+      font-size: 1.2em;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #6a4fc4;
+      color: white;
+      cursor: pointer;
+    }
+    #score, #level {
+      font-size: 1.3em;
+      margin: 10px;
+    }
+    #result {
+      font-size: 1.2em;
+      margin: 15px;
+      font-weight: bold;
+      min-height: 1.5em;
+    }
+    #characterSelect {
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <h1>🧙‍♂️ TrachtenBattle: Wizard of Numbers</h1>
+
+    <div id="characterSelect">
+      <p>Choose your wizard name:</p>
+      <input type="text" id="wizardName" placeholder="e.g., Trachty the Fast" />
+      <button onclick="startGame()">Begin Trachten-Training</button>
+    </div>
+
+    <div id="gameplay" class="hidden">
+      <div id="dialogue"></div>
+      <div id="question"></div>
+      <input type="number" id="answer" disabled />
+      <button id="answerBtn" onclick="checkAnswer()" disabled>Conjure Answer!</button>
+      <div id="result"></div>
+      <div id="score"></div>
+      <div id="level"></div>
+    </div>
+  </div>
+
+<script>
+  let num1, num2, correctAnswer;
+  let coins = 0;
+  let level = 1;
+  let wizardName = '';
+
+  // Load saved game if available
+  function loadGame() {
+    const savedName = localStorage.getItem('wizardName');
+    const savedCoins = localStorage.getItem('coins');
+    const savedLevel = localStorage.getItem('level');
+
+    if (savedName) {
+      wizardName = savedName;
+      coins = savedCoins ? parseInt(savedCoins) : 0;
+      level = savedLevel ? parseInt(savedLevel) : 1;
+
+      document.getElementById('wizardName').value = wizardName;
+      document.getElementById('characterSelect').classList.add('hidden');
+      document.getElementById('gameplay').classList.remove('hidden');
+      updateScoreLevel();
+      showDialogue(`Welcome back, ${wizardName}! Continue your Trachten-Training journey!`);
+      setTimeout(startRound, 2500);
+      return true;
+    }
+    return false;
+  }
+
+  function saveGame() {
+    localStorage.setItem('wizardName', wizardName);
+    localStorage.setItem('coins', coins);
+    localStorage.setItem('level', level);
+  }
+
+  function startGame() {
+    wizardName = document.getElementById('wizardName').value.trim() || 'Trachling';
+    document.getElementById('characterSelect').classList.add('hidden');
+    document.getElementById('gameplay').classList.remove('hidden');
+    coins = 0;
+    level = 1;
+    updateScoreLevel();
+    showDialogue(`Welcome, ${wizardName}! Your journey through the Number Realms begins now!\n\nGet ready to learn the Trachtenberg multiplication magic!`);
+    saveGame();
+    setTimeout(startRound, 3500);
+  }
+
+  function showDialogue(text) {
+    document.getElementById('dialogue').innerText = text;
+  }
+
+  function updateScoreLevel() {
+    document.getElementById('score').innerText = `Magic Coins: ${coins}`;
+    document.getElementById('level').innerText = `Wizard Rank: ${level}`;
+    saveGame();
+  }
+
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  // This function returns ONLY the rule explanation text for the chosen multiplier
+  function getRuleExplanation(m) {
+    switch(m) {
+      case 2:
+        return `Rule ×2:\nDouble each digit from right to left, carrying over as needed.`;
+      case 3:
+        return `Rule ×3:\nSubtract rightmost digit from 10, and the other from 9, double each digit and add half the neighbor to the right, plus 5 if the current digit is odd, then carry as needed. For the leading zero, subtract 2 from half the neighbor.`;
+      case 4:
+        return `Rule ×4:\nSubtract rightmost digit from 10, and the other from 9, add half of the neighbor, plus 5 if the digit is odd, and carry as needed. For the leading zero, subtract 1 from half the neighbor.`;
+      case 5:
+        return `Rule ×5:\nTake half the neighbor to the right, plus 5 if the digit is odd. Carry as needed.`;
+      case 6:
+        return `Rule ×6:\nAdd half the neighbor, and add 5 if digit is odd. Carry as needed.`;
+      case 7:
+        return `Rule ×7:\nDouble each digit, add half the neighbor, and add 5 if digit is odd. Carry as needed.`;
+      case 8:
+        return `Rule ×8:\nSubtract rightmost digit from 10, and the other from 9, double it, add neighbor, and carry as needed. For leading zero, subtract two from the neighbor.`;
+      case 9:
+        return `Rule ×9:\nSubtract rightmost digit from 10, and the others from 9, add neighbor, and carry as needed. For leading zero, subtract one form the neigbor.`;
+      case 10:
+        return `Rule ×10:\nAdd a zero to the end of the number.`;
+      case 11:
+        return `Rule ×11:\nAdd each digit to its neighbor on the right, carry as needed.`;
+      default:
+        return `No Trachtenberg rule for ×${m}. Use normal multiplication.`;
+    }
+  }
+
+  // Full correct multiplication (not shown until after answer)
+  function normalMultiply(n, m) {
+    return n * m;
+  }
+
+  function generateQuestion() {
+    num1 = randomInt(10, 999);
+    num2 = randomInt(2, 11);
+    correctAnswer = normalMultiply(num1, num2);
+    const ruleText = getRuleExplanation(num2);
+
+    showDialogue(`🧙‍♂️ Trachtenberg Rule for ×${num2}:\n\n${ruleText}\n\nWhen you're ready, solve this:`);
+    document.getElementById('question').innerText = `${num1} × ${num2} = ?`;
+    document.getElementById('answer').value = '';
+    document.getElementById('result').innerText = '';
+    document.getElementById('answer').disabled = true;
+    document.getElementById('answerBtn').disabled = true;
+
+    setTimeout(() => {
+      document.getElementById('answer').disabled = false;
+      document.getElementById('answerBtn').disabled = false;
+      document.getElementById('answer').focus();
+    }, 3000);
+  }
+
+  function checkAnswer() {
+    const userAnswer = parseInt(document.getElementById('answer').value);
+    if (userAnswer === correctAnswer) {
+      coins++;
+      showDialogue(`✨ Well done, ${wizardName}! Your spell worked and earned you a coin!`);
+      document.getElementById('result').innerText = '';
+      if (coins % 3 === 0) {
+        level++;
+        showDialogue(`🎉 Level Up! Welcome to Trachten-Level ${level}, ${wizardName}!`);
+      }
+    } else {
+      showDialogue(`🧨 Spell fizzled! Try again, ${wizardName}!`);
+      document.getElementById('result').innerText = `Correct answer was: ${correctAnswer}`;
+    }
+    updateScoreLevel();
+    document.getElementById('answer').value = '';
+    document.getElementById('answer').disabled = true;
+    document.getElementById('answerBtn').disabled = true;
+    setTimeout(generateQuestion, 9000);
+  }
+
+  function startRound() {
+    generateQuestion();
+  }
+
+  // Attempt to load saved game on page load
+  window.onload = function() {
+    if (!loadGame()) {
+      // No saved game, show character selection
+      document.getElementById('characterSelect').classList.remove('hidden');
+      document.getElementById('gameplay').classList.add('hidden');
+    }
+  };
+</script>
+</body>
+</html>
